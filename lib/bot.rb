@@ -50,6 +50,7 @@ class Bot
 
   def handle_comment_created
     issue = find_or_create_issue(extract_issue_id(@title))
+    @qa_comment = parse_comment_images
     Jira::Comment.create(issue.key, @qa_comment)
     Github::Reaction.create(@repo, @comment_id, "+1")
   end
@@ -81,5 +82,9 @@ class Bot
     prefixed_title = "[##{new_issue.key}] #{@title}"
     Github::PullRequest.update_title(@repo, @pr_number, prefixed_title)
     new_issue
+  end
+
+  def parse_comment_images
+    @qa_comment.gsub(/(?:!\[(.*?)\]\((.*?)\))/) { |image| "!#{image.split('(').last.delete(')')}!" }
   end
 end
