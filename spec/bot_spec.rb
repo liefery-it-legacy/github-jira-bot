@@ -137,6 +137,16 @@ describe Bot do
           handle_comment
         end
       end
+
+      context "with inline image" do
+        let(:comment) { "QA: foo\nbar![foo](https://user-images.githubusercontent.com/foo.png)" }
+
+        it "parses image correctly" do
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo\nbar!https://user-images.githubusercontent.com/foo.png!")
+          expect(Github::Reaction).to receive(:create)
+          handle_comment
+        end
+      end
     end
 
     context "when linked issue doesn't exist" do
