@@ -147,6 +147,16 @@ describe Bot do
           handle_comment
         end
       end
+
+      context "with headings" do
+        let(:comment) { "QA: # foo\n## bar\ncontent" }
+
+        it "parses headings correctly" do
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "h1. foo\nh2. bar\ncontent")
+          expect(Github::Reaction).to receive(:create)
+          handle_comment
+        end
+      end
     end
 
     context "when linked issue doesn't exist" do
@@ -215,6 +225,18 @@ describe Bot do
         )
         expect(Github::Comment).to(
           receive(:create).with("foo/bar", 23, "https://liefery.atlassian.net/browse/LIEF-123")
+        )
+        handle_pull_request
+      end
+
+      it "parses headings correctly" do
+        allow(Jira::Issue).to(
+          receive(:find).and_return(
+            double(attrs: { "fields" => { "description" => "h1. foo\nh2. bar\ncontent" }, "url" => "https://liefery.atlassian.net/browse/LIEF-123" })
+          )
+        )
+        expect(Github::Comment).to(
+          receive(:create).with("foo/bar", 23, "# foo\n## bar\ncontent\n\nhttps://liefery.atlassian.net/browse/LIEF-123")
         )
         handle_pull_request
       end
