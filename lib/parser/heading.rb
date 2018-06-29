@@ -3,9 +3,9 @@
 module Parser
   class Heading
     def call(content, format:)
-      if format == 'github'
+      if format == "github"
         github(content)
-      elsif format == 'jira'
+      elsif format == "jira"
         jira(content)
       end
     end

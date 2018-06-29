@@ -3,7 +3,7 @@
 module Parser
   class Image
     def call(content, format:)
-      github(content) if format == 'github'
+      github(content) if format == "github"
     end
 
     private
