@@ -2,9 +2,11 @@
 
 require "jira/comment"
 require "jira/issue"
-require "github/reaction"
-require "github/pull_request"
 require "github/comment"
+require "github/pull_request"
+require "github/reaction"
+require "parser/heading"
+require "parser/image"
 
 class Bot
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
@@ -50,14 +52,14 @@ class Bot
 
   def handle_comment_created
     issue = find_or_create_issue(extract_issue_id(@title))
-    @qa_comment = parse_comment_images(@qa_comment)
-    @qa_comment = parse_github_headings(@qa_comment)
+    @qa_comment = Parser::Image.new.call(@qa_comment)
+    @qa_comment = Parser::Heading.new.call(@qa_comment, format: 'github')
     Jira::Comment.create(issue.key, @qa_comment)
     Github::Reaction.create(@repo, @comment_id, "+1")
   end
 
   def handle_pull_request_opened
-    @jira_description = parse_jira_headings(@jira_description)
+    @jira_description = Parser::Heading.new.call(@jira_description, format: 'jira')
     Github::Comment.create(@repo, @pr_number, pull_request_comment_content)
   end
 
@@ -84,17 +86,5 @@ class Bot
     prefixed_title = "[##{new_issue.key}] #{@title}"
     Github::PullRequest.update_title(@repo, @pr_number, prefixed_title)
     new_issue
-  end
-
-  def parse_comment_images(content)
-    content&.gsub(/(?:!\[(.*?)\]\((.*?)\))/) { |image| "!#{image.split('(').last.delete(')')}!" }
-  end
-
-  def parse_jira_headings(content)
-    content&.gsub(/h(1|2|3|4|5|6)\./) { |h| "#" * h[1].to_i }
-  end
-
-  def parse_github_headings(content)
-    content&.gsub(/(\#\#\#\#\#\#|\#\#\#\#\#|\#\#\#\#|\#\#\#|\#\#|\#)/) { |h| "h#{h.length}." }
   end
 end
