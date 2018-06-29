@@ -52,7 +52,7 @@ class Bot
 
   def handle_comment_created
     issue = find_or_create_issue(extract_issue_id(@title))
-    @qa_comment = Parser::Image.new.call(@qa_comment)
+    @qa_comment = Parser::Image.new.call(@qa_comment, format: 'github')
     @qa_comment = Parser::Heading.new.call(@qa_comment, format: 'github')
     Jira::Comment.create(issue.key, @qa_comment)
     Github::Reaction.create(@repo, @comment_id, "+1")
