@@ -229,7 +229,7 @@ describe Bot do
         )
         handle_pull_request
       end
-      
+
       it "parses headings correctly" do
         allow(Jira::Issue).to(
           receive(:find).and_return(
@@ -241,7 +241,7 @@ describe Bot do
         )
         handle_pull_request
       end
-      
+
       context "when max_description_chars has not been given" do
         let(:max_description_chars) { nil }
 
