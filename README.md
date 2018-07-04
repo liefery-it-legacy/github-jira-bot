@@ -31,7 +31,7 @@ First you need a place for the bot to run. We at Liefery use Jenkins for this.
     * `REPO` => `$.repository.full_name`
     * `PR_TITLE` => `$.pull_request.title`
     * `PR_TITLE` => `$.issue.title`
-    * `AUTHOR` => `$.user.login`
+    * `AUTHOR` => `$.comment.user.login`
     * `PR_NUMBER` => `$.pull_request.number`
     * `PR_NUMBER` => `$.issue.number`
     * `COMMENT_ID` => `$.comment.id`
