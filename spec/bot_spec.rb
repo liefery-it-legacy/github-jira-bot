@@ -5,14 +5,15 @@ require "configuration/jira"
 require "bot"
 
 describe Bot do
-  let(:action)             { "created" }
-  let(:title)              { "[#LIEF-123] Cure World Hunger!" }
-  let(:comment)            { "I did it!" }
-  let(:repo)               { "foo/bar" }
-  let(:author)             { "jonhue" }
-  let(:pr_number)          { 23 }
-  let(:comment_id)         { 12345 }
-  let(:jira_transition_id) { nil }
+  let(:action)                { "created" }
+  let(:title)                 { "[#LIEF-123] Cure World Hunger!" }
+  let(:comment)               { "I did it!" }
+  let(:repo)                  { "foo/bar" }
+  let(:author)                { "jonhue" }
+  let(:pr_number)             { 23 }
+  let(:comment_id)            { 12345 }
+  let(:jira_transition_id)    { nil }
+  let(:max_description_chars) { 600 }
 
   let(:jira_configuration) do
     Configuration::Jira.new(
@@ -26,7 +27,7 @@ describe Bot do
     described_class.new(
       repo: repo,
       magic_qa_keyword: "QA:",
-      max_description_chars: 600,
+      max_description_chars: max_description_chars,
       component_map: { "repo": "component" },
       bot_github_login: "bot-user",
       jira_configuration: jira_configuration
@@ -239,6 +240,26 @@ describe Bot do
           receive(:create).with("foo/bar", 23, "# foo\n## bar\ncontent\n\nhttps://liefery.atlassian.net/browse/LIEF-123")
         )
         handle_pull_request
+      end
+
+      context "when max_description_chars has not been given" do
+        let(:max_description_chars) { nil }
+
+        it "adds the entire Jira ticket description to GitHub" do
+          allow(Jira::Issue).to(
+            receive(:find).and_return(
+              double(attrs: { "fields" => { "description" => "test" }, "url" => "https://liefery.atlassian.net/browse/LIEF-123" })
+            )
+          )
+          expect(Github::Comment).to(
+            receive(:create).with(
+              "foo/bar",
+              23,
+              "<details><summary>Ticket description</summary>test</details>\n\nhttps://liefery.atlassian.net/browse/LIEF-123"
+            )
+          )
+          handle_pull_request
+        end
       end
     end
 

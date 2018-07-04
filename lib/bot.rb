@@ -65,7 +65,12 @@ class Bot
   end
 
   def pull_request_comment_content
-    "#{@jira_description.truncate(@max_description_chars.to_i) + "\n\n" if @jira_description}#{@jira_url}"
+    return @jira_url unless @jira_description
+    if @max_description_chars
+      "#{@jira_description.truncate(@max_description_chars.to_i)}\n\n#{@jira_url}"
+    else
+      "<details><summary>Ticket description</summary>#{@jira_description}</details>\n\n#{@jira_url}"
+    end
   end
 
   def extract_qa_comment

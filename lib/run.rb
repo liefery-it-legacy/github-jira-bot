@@ -18,7 +18,7 @@ comment               = ENV.fetch("COMMENT_BODY", "")
 comment_id            = ENV.fetch("COMMENT_ID", "")
 
 magic_qa_keyword      = ENV.fetch("MAGIC_QA_KEYWORD")
-max_description_chars = ENV.fetch("MAX_DESCRIPTION_CHARS")
+max_description_chars = ENV.fetch("MAX_DESCRIPTION_CHARS", nil)
 component_map         = JSON.parse(ENV.fetch("COMPONENT_MAP", "{}"))
 bot_github_login      = ENV.fetch("GITHUB_USERNAME")
 jira_project_key      = ENV.fetch("JIRA_PROJECT_KEY")

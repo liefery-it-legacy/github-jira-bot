@@ -94,7 +94,7 @@ ruby lib/run.rb
 * `GITHUB_USERNAME`: Username of a GitHub account.
 * `GITHUB_PASSWORD`: Password of a GitHub account.
 * `MAGIC_QA_KEYWORD`: Keyword that detects information in comments that should be added to the Jira ticket.
-* `MAX_DESCRIPTION_CHARS`: The maximum number of chars of a Jira ticket description that will be added to a pull request on GitHub.
+* `MAX_DESCRIPTION_CHARS`: The maximum number of chars of a Jira ticket description that will be added to a pull request on GitHub. Omit this environment variable if you want to add the entire ticket description to GitHub.
 * `COMPONENT_MAP`: Mapping of GitHub repositories and Jira components used when creating new Jira tickets. Has to be a stringified JSON hash.
 
 ## Local Development
