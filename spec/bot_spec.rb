@@ -220,7 +220,7 @@ describe Bot do
         handle_pull_request
       end
 
-      context "when magic_qa_keyword has not been given" do
+      context "when max_description_chars has not been given" do
         let(:max_description_chars) { nil }
 
         it "adds the entire Jira ticket description to GitHub" do
