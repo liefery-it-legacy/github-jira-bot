@@ -74,10 +74,8 @@ class Bot
   end
 
   def extract_qa_comment
-    comment_regex = Regexp.new("#{Regexp.escape(@magic_qa_keyword)}(.*)", Regexp::MULTILINE)
-    match_data = @comment.match(comment_regex)
-    return unless match_data
-    match_data[1].strip
+    return unless @comment.match?(/[@#]?#{@magic_qa_keyword}:?.*\w+/)
+    @comment
   end
 
   def find_or_create_issue(issue_id)
