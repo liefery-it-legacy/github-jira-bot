@@ -26,7 +26,7 @@ describe Bot do
   let(:bot) do
     described_class.new(
       repo: repo,
-      magic_qa_keyword: "QA",
+      magic_qa_keyword: "QA:",
       max_description_chars: max_description_chars,
       component_map: { "repo": "component" },
       bot_github_login: "bot-user",
@@ -92,7 +92,7 @@ describe Bot do
         let(:comment) { "foo\nbar\nbaz QA: this\nis\na\nmultiline\ncomment" }
 
         it "uses all lines" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo\nbar\nbaz QA: this\nis\na\nmultiline\ncomment")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: this\nis\na\nmultiline\ncomment")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
@@ -102,7 +102,7 @@ describe Bot do
         let(:comment) { "bar baz QA: foo" }
 
         it "creates a jira comment with the rest of the comment" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "bar baz QA: foo")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: foo")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
@@ -150,10 +150,10 @@ describe Bot do
       end
 
       context "with headings" do
-        let(:comment) { "QA # foo\n## bar\ncontent" }
+        let(:comment) { "qa: # foo\n## bar\ncontent" }
 
         it "parses headings correctly" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA h1. foo\nh2. bar\ncontent")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "qa: h1. foo\nh2. bar\ncontent")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
