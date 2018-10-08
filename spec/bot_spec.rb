@@ -82,7 +82,7 @@ describe Bot do
         let(:comment) { "QA: foo" }
 
         it "creates a jira comment with the rest of the comment and adds a reaction to the comment" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: foo")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
@@ -92,7 +92,7 @@ describe Bot do
         let(:comment) { "foo\nbar\nbaz QA: this\nis\na\nmultiline\ncomment" }
 
         it "uses all lines" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "this\nis\na\nmultiline\ncomment")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: this\nis\na\nmultiline\ncomment")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
@@ -102,7 +102,7 @@ describe Bot do
         let(:comment) { "bar baz QA: foo" }
 
         it "creates a jira comment with the rest of the comment" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: foo")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
@@ -143,17 +143,17 @@ describe Bot do
         let(:comment) { "QA: foo\nbar![foo](https://user-images.githubusercontent.com/foo.png)" }
 
         it "parses image correctly" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo\nbar!https://user-images.githubusercontent.com/foo.png!")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: foo\nbar!https://user-images.githubusercontent.com/foo.png!")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
       end
 
       context "with headings" do
-        let(:comment) { "QA: # foo\n## bar\ncontent" }
+        let(:comment) { "qa: # foo\n## bar\ncontent" }
 
         it "parses headings correctly" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "h1. foo\nh2. bar\ncontent")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "qa: h1. foo\nh2. bar\ncontent")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
@@ -169,7 +169,7 @@ describe Bot do
 
       it "creates the issue and renames the github PR" do
         expect(Jira::Issue).to receive(:create).and_return(double(key: "LIEF-123"))
-        expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo")
+        expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: foo")
         expect(Github::PullRequest).to receive(:update_title)
         expect(Github::Reaction).to receive(:create)
         handle_comment
@@ -181,7 +181,7 @@ describe Bot do
         it "creates the issue and renames the github PR" do
           expect(Jira::Issue).to receive(:create).and_return(double(key: "LIEF-123"))
           expect(Jira::Issue).to receive(:transition).with(anything, "foo_123")
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "foo")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: foo")
           expect(Github::PullRequest).to receive(:update_title)
           expect(Github::Reaction).to receive(:create)
           handle_comment

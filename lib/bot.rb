@@ -46,6 +46,7 @@ class Bot
   def extract_issue_id(title)
     match_data = title.match(/\A\[#([A-Z]+-\d+)\]/)
     return unless match_data
+
     match_data[1].strip
   end
 
@@ -66,6 +67,7 @@ class Bot
 
   def pull_request_comment_content
     return @jira_url unless @jira_description
+
     if @max_description_chars
       "#{@jira_description.truncate(@max_description_chars.to_i)}\n\n#{@jira_url}"
     else
@@ -74,10 +76,11 @@ class Bot
   end
 
   def extract_qa_comment
-    comment_regex = Regexp.new("#{Regexp.escape(@magic_qa_keyword)}(.*)", Regexp::MULTILINE)
-    match_data = @comment.match(comment_regex)
-    return unless match_data
-    match_data[1].strip
+    search_pattern = /#{@magic_qa_keyword}.*\w+/i
+    return unless @comment.match?(search_pattern)
+
+    parts = @comment.partition search_pattern
+    parts[1] + parts[2]
   end
 
   def find_or_create_issue(issue_id)
