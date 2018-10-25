@@ -10,6 +10,9 @@ require "parser/github_to_jira/image"
 require "parser/jira_to_github/heading"
 
 class Bot
+  PR_NAME_TICKET_ID_REGEX = /\A\[#LIEF-(\d{4,})\]/
+  BRANCH_NAME_TICKET_ID_REGEX = /\A\w+\/lief\ (\d{4,})/
+
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
     @repo                  = repo
     @magic_qa_keyword      = magic_qa_keyword
@@ -44,10 +47,10 @@ class Bot
   end
 
   def extract_issue_id(title)
-    match_data = title.match(/\A\[#([A-Z]+-\d+)\]/)
+    match_data = title.match(PR_NAME_TICKET_ID_REGEX) || title.match(BRANCH_NAME_TICKET_ID_REGEX)
     return unless match_data
 
-    match_data[1].strip
+    "LIEF-" + match_data[1].strip
   end
 
   private

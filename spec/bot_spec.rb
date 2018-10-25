@@ -6,7 +6,8 @@ require "bot"
 
 describe Bot do
   let(:action)                { "created" }
-  let(:title)                 { "[#LIEF-123] Cure World Hunger!" }
+  let(:title)                 { "[#LIEF-1234] Cure World Hunger!" }
+  let(:branch_name)           { "feature/lief 1234 cure world hunger!" }
   let(:comment)               { "I did it!" }
   let(:repo)                  { "foo/bar" }
   let(:author)                { "jonhue" }
@@ -35,11 +36,10 @@ describe Bot do
   end
 
   describe "#extract_issue_id" do
-    subject(:issue_id) { bot.extract_issue_id(title) }
-
-    context "when title contains properly formatted issue" do
+    context "when title or branch name contain issue id" do
       it "returns the issue id" do
-        expect(issue_id).to eq "LIEF-123"
+        expect(bot.extract_issue_id(title)).to       eq "LIEF-1234"
+        expect(bot.extract_issue_id(branch_name)).to eq "LIEF-1234"
       end
     end
 
@@ -47,7 +47,7 @@ describe Bot do
       let(:title) { "Title without issue id" }
 
       it "returns nil" do
-        expect(issue_id).to eq nil
+        expect(bot.extract_issue_id(title)).to eq nil
       end
     end
   end
