@@ -10,8 +10,8 @@ require "parser/github_to_jira/image"
 require "parser/jira_to_github/heading"
 
 class Bot
-  PR_NAME_TICKET_ID_REGEX = /\A\[#LIEF-(\d{4,})\]/
-  BRANCH_NAME_TICKET_ID_REGEX = /\A\w+\/lief\ (\d{4,})/
+  PR_NAME_TICKET_ID_REGEX = /\A\[#LIEF-(\d{3,})\]/
+  BRANCH_NAME_TICKET_ID_REGEX = /\A\w+\/lief-(\d{3,})/
 
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
     @repo                  = repo

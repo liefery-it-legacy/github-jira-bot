@@ -7,7 +7,7 @@ require "bot"
 describe Bot do
   let(:action)                { "created" }
   let(:title)                 { "[#LIEF-1234] Cure World Hunger!" }
-  let(:branch_name)           { "feature/lief 1234 cure world hunger!" }
+  let(:branch_name)           { "feature/lief-1234-cure-world-hunger!" }
   let(:comment)               { "I did it!" }
   let(:repo)                  { "foo/bar" }
   let(:author)                { "jonhue" }
