@@ -109,3 +109,13 @@ This project uses RSpec for testing:
 
 1. `bundle install`
 2. `bundle exec rspec`
+
+## Deployment
+
+```
+git fetch
+git checkout production
+git pull
+git reset --hard origin/master
+git push
+```
