@@ -6,7 +6,7 @@ require "bot"
 
 describe Bot do
   let(:action)                { "created" }
-  let(:title)                 { "[#LIEF-1234] Cure World Hunger!" }
+  let(:title)                 { "[#LIEF-1234] Cure world hunger!" }
   let(:branch_name)           { "feature/lief-1234-cure-world-hunger!" }
   let(:comment)               { "I did it!" }
   let(:repo)                  { "foo/bar" }
@@ -206,6 +206,17 @@ describe Bot do
     subject(:handle_pull_request) { bot.handle_pull_request(action: "opened", title: title, pr_number: pr_number) }
 
     context "when linked issue exists" do
+      it "fixes the PR title if it is based on the branch name" do
+        allow(Jira::Issue).to(
+          receive(:find).and_return(
+            double(attrs: { "fields" => { "description" => "test" }, "url" => "https://liefery.atlassian.net/browse/LIEF-123" })
+          )
+        )
+
+        expect(Github::PullRequest).to receive(:update_title)
+        bot.handle_pull_request(action: "opened", title: branch_name, pr_number: pr_number)
+      end
+
       it "adds issue URL and description to GitHub when description exists" do
         allow(Jira::Issue).to(
           receive(:find).and_return(

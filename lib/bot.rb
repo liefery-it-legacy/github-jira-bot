@@ -66,6 +66,7 @@ class Bot
   def handle_pull_request_opened
     @jira_description = Parser::JiraToGithub::Heading.new.call(@jira_description)
     Github::Comment.create(@repo, @pr_number, pull_request_comment_content)
+    fix_pr_title
   end
 
   def pull_request_comment_content
@@ -80,7 +81,7 @@ class Bot
 
   def extract_qa_comment
     search_pattern = /#{@magic_qa_keyword}.*\w+/i
-    return unless @comment.match?(search_pattern)
+    return unless @comment.match(search_pattern)
 
     parts = @comment.partition search_pattern
     parts[1] + parts[2]
@@ -98,5 +99,14 @@ class Bot
     prefixed_title = "[##{new_issue.key}] #{@title}"
     Github::PullRequest.update_title(@repo, @pr_number, prefixed_title)
     new_issue
+  end
+
+  def fix_pr_title
+    id = @title.match BRANCH_NAME_TICKET_ID_REGEX
+    return unless id
+
+    humanized_title = @title.gsub(id[0], "").tr("-", " ").strip.capitalize
+
+    Github::PullRequest.update_title(@repo, @pr_number, "[#LIEF-#{id[1]}] #{humanized_title}")
   end
 end
