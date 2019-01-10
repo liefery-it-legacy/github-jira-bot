@@ -213,6 +213,7 @@ describe Bot do
           )
         )
 
+        expect(Github::Comment).to receive(:create)
         expect(Github::PullRequest).to receive(:update_title)
         bot.handle_pull_request(action: "opened", title: branch_name, pr_number: pr_number)
       end
