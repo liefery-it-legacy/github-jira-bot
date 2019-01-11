@@ -41,6 +41,7 @@ class Bot
     @jira_issue       = Jira::Issue.find(extract_issue_id(@title))
     @jira_url         = @jira_issue&.attrs&.dig("url")
     @jira_description = @jira_issue&.attrs&.dig("fields", "description")
+    @jira_title       = @jira_issue&.attrs&.dig("fields", "summary")
     @pr_number        = pr_number
 
     handle_pull_request_opened if @jira_url.present? && @action == "opened"
@@ -81,7 +82,7 @@ class Bot
 
   def extract_qa_comment
     search_pattern = /#{@magic_qa_keyword}.*\w+/i
-    return unless @comment.match(search_pattern)
+    return unless @comment.match?(search_pattern)
 
     parts = @comment.partition search_pattern
     parts[1] + parts[2]
@@ -105,8 +106,6 @@ class Bot
     id = @title.match BRANCH_NAME_TICKET_ID_REGEX
     return unless id
 
-    humanized_title = @title.gsub(id[0], "").tr("-", " ").strip.capitalize
-
-    Github::PullRequest.update_title(@repo, @pr_number, "[#LIEF-#{id[1]}] #{humanized_title}")
+    Github::PullRequest.update_title(@repo, @pr_number, "[#LIEF-#{id[1]}] #{@jira_title}")
   end
 end

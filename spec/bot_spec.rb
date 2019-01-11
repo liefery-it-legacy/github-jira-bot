@@ -209,7 +209,8 @@ describe Bot do
       it "fixes the PR title if it is based on the branch name" do
         allow(Jira::Issue).to(
           receive(:find).and_return(
-            double(attrs: { "fields" => { "description" => "test" }, "url" => "https://liefery.atlassian.net/browse/LIEF-123" })
+            double(attrs: { "fields" => { "description" => "test", "summary" => "Cure world hunger!" },
+                            "url" => "https://liefery.atlassian.net/browse/LIEF-1234" })
           )
         )
 
