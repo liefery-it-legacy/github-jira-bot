@@ -41,6 +41,7 @@ class Bot
     @jira_issue       = Jira::Issue.find(extract_issue_id(@title))
     @jira_url         = @jira_issue&.attrs&.dig("url")
     @jira_description = @jira_issue&.attrs&.dig("fields", "description")
+    @jira_title       = @jira_issue&.attrs&.dig("fields", "summary")
     @pr_number        = pr_number
 
     handle_pull_request_opened if @jira_url.present? && @action == "opened"
@@ -66,6 +67,7 @@ class Bot
   def handle_pull_request_opened
     @jira_description = Parser::JiraToGithub::Heading.new.call(@jira_description)
     Github::Comment.create(@repo, @pr_number, pull_request_comment_content)
+    fix_pr_title
   end
 
   def pull_request_comment_content
@@ -98,5 +100,12 @@ class Bot
     prefixed_title = "[##{new_issue.key}] #{@title}"
     Github::PullRequest.update_title(@repo, @pr_number, prefixed_title)
     new_issue
+  end
+
+  def fix_pr_title
+    id = @title.match BRANCH_NAME_TICKET_ID_REGEX
+    return unless id
+
+    Github::PullRequest.update_title(@repo, @pr_number, "[#LIEF-#{id[1]}] #{@jira_title}")
   end
 end
