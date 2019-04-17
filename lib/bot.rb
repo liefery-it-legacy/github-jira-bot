@@ -10,8 +10,8 @@ require "parser/github_to_jira/image"
 require "parser/jira_to_github/heading"
 
 class Bot
-  PR_NAME_TICKET_ID_REGEX = /\A\[#LIEF-(\d{3,})\]/
-  BRANCH_NAME_TICKET_ID_REGEX = /\A\w+\/lief-(\d{3,})/
+  PR_NAME_TICKET_ID_REGEX = /\A\[LIEF-(\d{3,})\]/
+  BRANCH_NAME_TICKET_ID_REGEX = /\A\w+\/LIEF-(\d{3,})/
 
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
     @repo                  = repo
@@ -97,7 +97,7 @@ class Bot
     new_issue = Jira::Issue.create(@jira_configuration.project_key, @jira_configuration.issue_type, @component, @title)
     Jira::Issue.transition(new_issue, @jira_configuration.transition_id) if @jira_configuration.transition_id
 
-    prefixed_title = "[##{new_issue.key}] #{@title}"
+    prefixed_title = "[#{new_issue.key}] #{@title}"
     Github::PullRequest.update_title(@repo, @pr_number, prefixed_title)
     new_issue
   end
@@ -106,6 +106,6 @@ class Bot
     id = @title.match BRANCH_NAME_TICKET_ID_REGEX
     return unless id
 
-    Github::PullRequest.update_title(@repo, @pr_number, "[#LIEF-#{id[1]}] #{@jira_title}")
+    Github::PullRequest.update_title(@repo, @pr_number, "[LIEF-#{id[1]}] #{@jira_title}")
   end
 end
