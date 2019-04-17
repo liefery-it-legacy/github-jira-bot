@@ -107,10 +107,10 @@ class Bot
   end
 
   def pr_name_ticket_id_regex
-    /\A\[#{@jira_configuration.project_key}-(\d+)\]/
+    /\A\[#{@jira_configuration.project_key}-(\d+)\]/i
   end
 
   def branch_name_ticket_id_regex
-    /\A\w+\/#{@jira_configuration.project_key}-(\d+)/
+    /\A\w+\/#{@jira_configuration.project_key} (\d+)/i
   end
 end

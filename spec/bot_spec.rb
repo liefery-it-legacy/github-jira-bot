@@ -5,16 +5,16 @@ require "configuration/jira"
 require "bot"
 
 describe Bot do
-  let(:action)                { "created" }
-  let(:title)                 { "[LIEF-1234] Cure world hunger!" }
-  let(:branch_name)           { "feature/LIEF-1234-cure-world-hunger!" }
-  let(:comment)               { "I did it!" }
-  let(:repo)                  { "foo/bar" }
-  let(:author)                { "jonhue" }
-  let(:pr_number)             { 23 }
-  let(:comment_id)            { 12345 }
-  let(:jira_transition_id)    { nil }
-  let(:max_description_chars) { 600 }
+  let(:action)                  { "created" }
+  let(:title)                   { "[LIEF-1234] Cure world hunger" }
+  let(:branch_name_based_title) { "Feature/lief 1234 cure world hunger" }
+  let(:comment)                 { "I did it!" }
+  let(:repo)                    { "foo/bar" }
+  let(:author)                  { "jonhue" }
+  let(:pr_number)               { 23 }
+  let(:comment_id)              { 12345 }
+  let(:jira_transition_id)      { nil }
+  let(:max_description_chars)   { 600 }
 
   let(:jira_configuration) do
     Configuration::Jira.new(
@@ -38,8 +38,8 @@ describe Bot do
   describe "#extract_issue_id" do
     context "when title or branch name contain issue id" do
       it "returns the issue id" do
-        expect(bot.extract_issue_id(title)).to       eq "LIEF-1234"
-        expect(bot.extract_issue_id(branch_name)).to eq "LIEF-1234"
+        expect(bot.extract_issue_id(title)).to                   eq "LIEF-1234"
+        expect(bot.extract_issue_id(branch_name_based_title)).to eq "LIEF-1234"
       end
     end
 
@@ -206,19 +206,6 @@ describe Bot do
     subject(:handle_pull_request) { bot.handle_pull_request(action: "opened", title: title, pr_number: pr_number) }
 
     context "when linked issue exists" do
-      it "fixes the PR title if it is based on the branch name" do
-        allow(Jira::Issue).to(
-          receive(:find).and_return(
-            double(attrs: { "fields" => { "description" => "test", "summary" => "Cure world hunger!" },
-                            "url" => "https://liefery.atlassian.net/browse/LIEF-1234" })
-          )
-        )
-
-        expect(Github::Comment).to receive(:create)
-        expect(Github::PullRequest).to receive(:update_title).with(repo, pr_number, title)
-        bot.handle_pull_request(action: "opened", title: branch_name, pr_number: pr_number)
-      end
-
       it "adds issue URL and description to GitHub when description exists" do
         allow(Jira::Issue).to(
           receive(:find).and_return(
@@ -272,6 +259,21 @@ describe Bot do
             )
           )
           handle_pull_request
+        end
+      end
+
+      context "when PR title is based on the branch name" do
+        it "fixes the PR title" do
+          allow(Jira::Issue).to(
+            receive(:find).and_return(
+              double(attrs: { "fields" => { "description" => "test", "summary" => "Cure world hunger" },
+                              "url" => "https://liefery.atlassian.net/browse/LIEF-1234" })
+            )
+          )
+
+          expect(Github::Comment).to receive(:create)
+          expect(Github::PullRequest).to receive(:update_title).with(repo, pr_number, title)
+          bot.handle_pull_request(action: "opened", title: branch_name_based_title, pr_number: pr_number)
         end
       end
     end
