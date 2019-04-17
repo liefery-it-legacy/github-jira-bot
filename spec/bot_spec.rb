@@ -18,7 +18,7 @@ describe Bot do
 
   let(:jira_configuration) do
     Configuration::Jira.new(
-      project_key: "FOO",
+      project_key: "LIEF",
       issue_type: "Story",
       transition_id: jira_transition_id
     )

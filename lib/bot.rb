@@ -10,9 +10,6 @@ require "parser/github_to_jira/image"
 require "parser/jira_to_github/heading"
 
 class Bot
-  PR_NAME_TICKET_ID_REGEX = /\A\[LIEF-(\d{3,})\]/
-  BRANCH_NAME_TICKET_ID_REGEX = /\A\w+\/LIEF-(\d{3,})/
-
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
     @repo                  = repo
     @magic_qa_keyword      = magic_qa_keyword
@@ -48,10 +45,10 @@ class Bot
   end
 
   def extract_issue_id(title)
-    match_data = title.match(PR_NAME_TICKET_ID_REGEX) || title.match(BRANCH_NAME_TICKET_ID_REGEX)
+    match_data = title.match(pr_name_ticket_id_regex) || title.match(branch_name_ticket_id_regex)
     return unless match_data
 
-    "LIEF-" + match_data[1].strip
+    "#{@jira_configuration.project_key}-" + match_data[1].strip
   end
 
   private
@@ -103,9 +100,17 @@ class Bot
   end
 
   def fix_pr_title
-    id = @title.match BRANCH_NAME_TICKET_ID_REGEX
+    id = @title.match(branch_name_ticket_id_regex)
     return unless id
 
-    Github::PullRequest.update_title(@repo, @pr_number, "[LIEF-#{id[1]}] #{@jira_title}")
+    Github::PullRequest.update_title(@repo, @pr_number, "[#{@jira_configuration.project_key}-#{id[1]}] #{@jira_title}")
+  end
+
+  def pr_name_ticket_id_regex
+    /\A\[#{@jira_configuration.project_key}-(\d+)\]/
+  end
+
+  def branch_name_ticket_id_regex
+    /\A\w+\/#{@jira_configuration.project_key}-(\d+)/
   end
 end
