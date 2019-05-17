@@ -78,11 +78,13 @@ class Bot
   end
 
   def extract_qa_comment
-    search_pattern = /#{@magic_qa_keyword}.*\w+/i
+    search_pattern = /(.*)(#{@magic_qa_keyword})(.*\w+.*)/im
+
     return unless @comment.match?(search_pattern)
 
-    parts = @comment.partition search_pattern
-    parts[1] + parts[2]
+    _ignored_prefix, qa_keyword, qa_comment = @comment.match(search_pattern).captures
+
+    qa_keyword + qa_comment
   end
 
   def find_or_create_issue(issue_id)

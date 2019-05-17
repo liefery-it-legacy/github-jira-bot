@@ -98,6 +98,16 @@ describe Bot do
         end
       end
 
+      context "when comment starts with QA: and is followed by new lines" do
+        let(:comment) { "QA: \r\n\r\nthis is\r\na test" }
+
+        it "creates a jira comment with the rest of the comment and adds a reaction to the comment" do
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: \r\n\r\nthis is\r\na test")
+          expect(Github::Reaction).to receive(:create)
+          handle_comment
+        end
+      end
+
       context "when comment has QA: in the middle" do
         let(:comment) { "bar baz QA: foo" }
 
