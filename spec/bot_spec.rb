@@ -163,7 +163,7 @@ describe Bot do
         let(:comment) { "qa: # foo\n## bar\ncontent" }
 
         it "parses headings correctly" do
-          expect(Jira::Comment).to receive(:create).with("LIEF-123", "qa: h1. foo\nh2. bar\ncontent")
+          expect(Jira::Comment).to receive(:create).with("LIEF-123", "QA: h1. foo\nh2. bar\ncontent")
           expect(Github::Reaction).to receive(:create)
           handle_comment
         end
