@@ -78,11 +78,10 @@ class Bot
   end
 
   def extract_qa_comment
-    search_pattern = /#{@magic_qa_keyword}.*\w+/i
-    return unless @comment.match?(search_pattern)
+    qa_comment = @comment[/#{@magic_qa_keyword}(.*\w+.*)/im, 1]
+    return unless qa_comment
 
-    parts = @comment.partition search_pattern
-    parts[1] + parts[2]
+    "#{@magic_qa_keyword}#{qa_comment}"
   end
 
   def find_or_create_issue(issue_id)
