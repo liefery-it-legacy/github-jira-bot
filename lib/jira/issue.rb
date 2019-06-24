@@ -31,10 +31,10 @@ module Jira
 
       def field_attributes(project, issue_type, component, title)
         {
-          "summary" => title,
-          "project" => { "key" => project },
-          "issuetype" => { "name" => issue_type },
-          "components" => [{ "name" => component }],
+          "summary"                      => title,
+          "project"                      => { "key" => project },
+          "issuetype"                    => { "name" => issue_type },
+          "components"                   => [{ "name" => component }],
           ENV.fetch("JIRA_SPRINT_FIELD") => current_sprint_id
         }
       end

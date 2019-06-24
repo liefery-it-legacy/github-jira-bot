@@ -39,17 +39,17 @@ def pull_request?(action, title, pr_number)
 end
 
 jira_configuration = Configuration::Jira.new(
-  project_key: jira_project_key,
-  issue_type: jira_issue_type,
+  project_key:   jira_project_key,
+  issue_type:    jira_issue_type,
   transition_id: jira_transition_id
 )
 bot = Bot.new(
-  repo: repo,
-  magic_qa_keyword: magic_qa_keyword,
+  repo:                  repo,
+  magic_qa_keyword:      magic_qa_keyword,
   max_description_chars: max_description_chars,
-  component_map: component_map,
-  bot_github_login: bot_github_login,
-  jira_configuration: jira_configuration
+  component_map:         component_map,
+  bot_github_login:      bot_github_login,
+  jira_configuration:    jira_configuration
 )
 
 if issue_comment?(action, title, comment, pr_number, author, comment_id)
