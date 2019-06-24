@@ -18,20 +18,20 @@ describe Bot do
 
   let(:jira_configuration) do
     Configuration::Jira.new(
-      project_key: "LIEF",
-      issue_type: "Story",
+      project_key:   "LIEF",
+      issue_type:    "Story",
       transition_id: jira_transition_id
     )
   end
 
   let(:bot) do
     described_class.new(
-      repo: repo,
-      magic_qa_keyword: "QA:",
+      repo:                  repo,
+      magic_qa_keyword:      "QA:",
       max_description_chars: max_description_chars,
-      component_map: { "repo": "component" },
-      bot_github_login: "bot-user",
-      jira_configuration: jira_configuration
+      component_map:         { "repo": "component" },
+      bot_github_login:      "bot-user",
+      jira_configuration:    jira_configuration
     )
   end
 
@@ -55,11 +55,11 @@ describe Bot do
   describe "#handle_comment" do
     subject(:handle_comment) do
       bot.handle_comment(
-        action: action,
-        title: title,
-        comment: comment,
-        pr_number: pr_number,
-        author: author,
+        action:     action,
+        title:      title,
+        comment:    comment,
+        pr_number:  pr_number,
+        author:     author,
         comment_id: comment_id
       )
     end
@@ -277,7 +277,7 @@ describe Bot do
           allow(Jira::Issue).to(
             receive(:find).and_return(
               double(attrs: { "fields" => { "description" => "test", "summary" => "Cure world hunger" },
-                              "url" => "https://liefery.atlassian.net/browse/LIEF-1234" })
+                              "url"    => "https://liefery.atlassian.net/browse/LIEF-1234" })
             )
           )
 

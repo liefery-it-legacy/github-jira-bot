@@ -18,6 +18,10 @@ AllCops:
 Rails:
   Enabled: true
 
+Layout/AlignHash:
+  EnforcedColonStyle: table
+  EnforcedHashRocketStyle: table
+
 Metrics/LineLength:
   Max: 150
 
