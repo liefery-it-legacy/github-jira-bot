@@ -15,9 +15,6 @@ AllCops:
     - 'config/**/*'
     - 'node_modules/**/*'
 
-Rails:
-  Enabled: true
-
 Layout/AlignHash:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
@@ -37,9 +34,6 @@ Naming/AccessorMethodName:
 
 Naming/VariableNumber:
   Enabled: false
-
-Rails/TimeZone:
-  EnforcedStyle: flexible
 
 Style/BlockDelimiters:
   EnforcedStyle: braces_for_chaining
