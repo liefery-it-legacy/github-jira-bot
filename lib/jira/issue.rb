@@ -13,10 +13,10 @@ module Jira
       issue
     end
 
-    def self.create(project, issue_type, component, title)
+    def self.create(project, issue_type, fix_version_id, component, title)
       issue = jira_client.Issue.build
       issue.save!(
-        "fields" => field_attributes(project, issue_type, component, title)
+        "fields" => field_attributes(project, issue_type, fix_version_id, component, title)
       )
       issue
     end
@@ -29,11 +29,12 @@ module Jira
     class << self
       private
 
-      def field_attributes(project, issue_type, component, title)
+      def field_attributes(project, issue_type, fix_version_id, component, title)
         {
           "summary"                      => title,
           "project"                      => { "key" => project },
           "issuetype"                    => { "name" => issue_type },
+          "fixVersions"                  => [{ "id" => fix_version_id }],
           "components"                   => [{ "name" => component }],
           ENV.fetch("JIRA_SPRINT_FIELD") => current_sprint_id
         }
