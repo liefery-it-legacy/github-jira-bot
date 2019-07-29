@@ -90,12 +90,26 @@ class Bot
   end
 
   def create_issue_and_update_github_pr_title
-    new_issue = Jira::Issue.create(@jira_configuration.project_key, @jira_configuration.issue_type, @component, @title)
-    Jira::Issue.transition(new_issue, @jira_configuration.transition_id) if @jira_configuration.transition_id
+    new_issue = create_issue
+    update_github_pr_title(new_issue)
+    new_issue
+  end
 
+  def create_issue
+    new_issue = Jira::Issue.create(
+      @jira_configuration.project_key,
+      @jira_configuration.issue_type,
+      @jira_configuration.fix_version_id,
+      @component,
+      @title
+    )
+    Jira::Issue.transition(new_issue, @jira_configuration.transition_id) if @jira_configuration.transition_id
+    new_issue
+  end
+
+  def update_github_pr_title(new_issue)
     prefixed_title = "[#{new_issue.key}] #{@title}"
     Github::PullRequest.update_title(@repo, @pr_number, prefixed_title)
-    new_issue
   end
 
   def fix_pr_title
