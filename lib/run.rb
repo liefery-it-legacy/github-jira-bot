@@ -23,6 +23,7 @@ component_map         = JSON.parse(ENV.fetch("COMPONENT_MAP", "{}"))
 bot_github_login      = ENV.fetch("GITHUB_USERNAME")
 jira_project_key      = ENV.fetch("JIRA_PROJECT_KEY")
 jira_issue_type       = ENV.fetch("JIRA_ISSUE_TYPE")
+jira_fix_version_id   = ENV.fetch("JIRA_FIX_VERSION_ID")
 jira_transition_id    = ENV.fetch("JIRA_NEW_TICKET_TRANSITION_ID")
 
 Octokit.configure do |c|
@@ -39,9 +40,10 @@ def pull_request?(action, title, pr_number)
 end
 
 jira_configuration = Configuration::Jira.new(
-  project_key:   jira_project_key,
-  issue_type:    jira_issue_type,
-  transition_id: jira_transition_id
+  project_key:    jira_project_key,
+  issue_type:     jira_issue_type,
+  fix_version_id: jira_fix_version_id,
+  transition_id:  jira_transition_id
 )
 bot = Bot.new(
   repo:                  repo,
