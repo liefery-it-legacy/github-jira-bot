@@ -70,6 +70,7 @@ export JIRA_PASSWORD = "XXX"
 export JIRA_URL = "https://XXX.atlassian.net"
 export JIRA_PROJECT_KEY = "XXX"
 export JIRA_ISSUE_TYPE = "Story"
+export JIRA_FIX_VERSION_ID = "XXX"
 export JIRA_SPRINT_FIELD = "customfield_XXX"
 export JIRA_NEW_TICKET_TRANSITION_ID = 711
 export GITHUB_USERNAME = "XXX"
@@ -89,6 +90,7 @@ ruby lib/run.rb
 * `JIRA_URL`: URL of your Jira workspace.
 * `JIRA_PROJECT_KEY`: Key of a Jira project. This looks something like `BT`.
 * `JIRA_ISSUE_TYPE`: Can be `Story`, `Improvement` or similar. This will only be used if the bot creates tickets.
+* `JIRA_FIX_VERSION_ID`: Id of the fix version to use when creating a Jira ticket.
 * `JIRA_SPRINT_FIELD`: The identifier of the sprint new tickets should be attached to upon creation.
 * `JIRA_NEW_TICKET_TRANSITION_ID`: The database ID of the transition to the state where newly created Jira tickets should be moved to.
 * `GITHUB_USERNAME`: Username of a GitHub account.
