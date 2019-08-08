@@ -33,12 +33,18 @@ class Bot
   end
 
   def handle_pull_request(action:, title:, pr_number:)
-    @action           = action
-    @title            = title
-    @jira_issue       = Jira::Issue.find(extract_issue_id(@title))
-    @jira_url         = @jira_issue&.attrs&.dig("url")
-    @jira_description = @jira_issue&.attrs&.dig("fields", "description")
-    @jira_title       = @jira_issue&.attrs&.dig("fields", "summary")
+    @action = action
+    @title  = title
+
+    jira_issue_id = extract_issue_id(@title)
+    return if jira_issue_id.nil?
+
+    jira_issue = Jira::Issue.find(jira_issue_id)
+    return if jira_issue.nil?
+
+    @jira_url         = jira_issue&.attrs&.dig("url")
+    @jira_description = jira_issue&.attrs&.dig("fields", "description")
+    @jira_title       = jira_issue&.attrs&.dig("fields", "summary")
     @pr_number        = pr_number
 
     handle_pull_request_opened if @jira_url.present? && @action == "opened"
