@@ -287,6 +287,13 @@ describe Bot do
           bot.handle_pull_request(action: "opened", title: branch_name_based_title, pr_number: pr_number)
         end
       end
+
+      it "doesn't fail when PR title doesn't contain a JIRA issue id" do
+        allow(Jira::Issue)
+          .to receive(:find).with(nil).and_raise("One does not simply find a JIRA issue without an ID!")
+
+        bot.handle_pull_request(action: "opened", title: "I don't give an id", pr_number: pr_number)
+      end
     end
 
     context "when linked issue doesn't exist" do
