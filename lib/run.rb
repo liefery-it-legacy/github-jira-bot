@@ -54,8 +54,13 @@ bot = Bot.new(
   jira_configuration:    jira_configuration
 )
 
-if issue_comment?(action, title, comment, pr_number, author, comment_id)
-  bot.handle_comment(action: action, title: title, comment: comment, pr_number: pr_number, author: author, comment_id: comment_id)
-elsif pull_request?(action, title, pr_number)
-  bot.handle_pull_request(action: action, title: title, pr_number: pr_number)
+begin
+  if issue_comment?(action, title, comment, pr_number, author, comment_id)
+    bot.handle_comment(action: action, title: title, comment: comment, pr_number: pr_number, author: author, comment_id: comment_id)
+  elsif pull_request?(action, title, pr_number)
+    bot.handle_pull_request(action: action, title: title, pr_number: pr_number)
+  end
+rescue JIRA::HTTPError => e
+  puts "JIRA responded with #{e.response.code}: #{e.response.body}"
+  raise
 end
