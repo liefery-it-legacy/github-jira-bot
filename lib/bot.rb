@@ -9,6 +9,7 @@ require "parser/github_to_jira/heading"
 require "parser/github_to_jira/image"
 require "parser/jira_to_github/heading"
 
+# rubocop:disable Metrics/ClassLength
 class Bot
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
     @repo                  = repo
@@ -33,13 +34,9 @@ class Bot
   end
 
   def handle_pull_request(action:, title:, pr_number:)
-    @action = action
-    @title  = title
-
-    jira_issue_id = extract_issue_id(@title)
-    return if jira_issue_id.nil?
-
-    jira_issue = Jira::Issue.find(jira_issue_id)
+    @action    = action
+    @title     = title
+    jira_issue = find_issue_by_title(@title)
     return if jira_issue.nil?
 
     @jira_url         = jira_issue&.attrs&.dig("url")
@@ -58,6 +55,13 @@ class Bot
   end
 
   private
+
+  def find_issue_by_title(title)
+    jira_issue_id = extract_issue_id(title)
+    return if jira_issue_id.nil?
+
+    Jira::Issue.find(jira_issue_id)
+  end
 
   def handle_comment_created
     issue = find_or_create_issue(extract_issue_id(@title))
@@ -133,3 +137,4 @@ class Bot
     /\A\w+\/#{@jira_configuration.project_key} (\d+)/i
   end
 end
+# rubocop:enable Metrics/ClassLength
