@@ -15,7 +15,7 @@ AllCops:
     - 'config/**/*'
     - 'node_modules/**/*'
 
-Layout/AlignHash:
+Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
 
