@@ -19,7 +19,7 @@ Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 150
 
 Metrics/BlockLength:
@@ -37,9 +37,6 @@ Naming/VariableNumber:
 
 Style/BlockDelimiters:
   EnforcedStyle: braces_for_chaining
-
-Style/BracesAroundHashParameters:
-  EnforcedStyle: context_dependent
 
 Style/ClassAndModuleChildren:
   Enabled: false
