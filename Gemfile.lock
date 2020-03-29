@@ -31,7 +31,7 @@ GEM
     minitest (5.14.0)
     multipart-post (2.1.1)
     oauth (0.5.4)
-    octokit (4.17.0)
+    octokit (4.18.0)
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
     parallel (1.19.1)
