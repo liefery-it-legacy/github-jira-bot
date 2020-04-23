@@ -1,0 +1,116 @@
+apiVersion: v1
+data:
+  config.xml: |-
+      <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+        <inheritFrom></inheritFrom>
+        <name>github-jira-bot</name>
+        <namespace></namespace>
+        <privileged>false</privileged>
+        <capOnlyOnAlivePods>false</capOnlyOnAlivePods>
+        <alwaysPullImage>false</alwaysPullImage>
+        <instanceCap>2147483647</instanceCap>
+        <slaveConnectTimeout>100</slaveConnectTimeout>
+        <idleMinutes>0</idleMinutes>
+        <activeDeadlineSeconds>0</activeDeadlineSeconds>
+        <label>github-jira-bot</label>
+        <serviceAccount>jenkins</serviceAccount>
+        <nodeSelector></nodeSelector>
+        <nodeUsageMode>NORMAL</nodeUsageMode>
+        <customWorkspaceVolumeEnabled>false</customWorkspaceVolumeEnabled>
+        <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+          <memory>false</memory>
+        </workspaceVolume>
+        <volumes>
+          <org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume>
+            <mountPath>/var/run/docker.sock</mountPath>
+            <hostPath>/var/run/docker.sock</hostPath>
+          </org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume>
+          <org.csanchez.jenkins.plugins.kubernetes.volumes.SecretVolume>
+            <mountPath>/root/.m2/</mountPath>
+            <secretName>jenkins-maven-settings-r1</secretName>
+          </org.csanchez.jenkins.plugins.kubernetes.volumes.SecretVolume>
+          <org.csanchez.jenkins.plugins.kubernetes.volumes.SecretVolume>
+            <mountPath>/home/jenkins/.docker</mountPath>
+            <secretName>jenkins-docker-cfg</secretName>
+          </org.csanchez.jenkins.plugins.kubernetes.volumes.SecretVolume>
+          <org.csanchez.jenkins.plugins.kubernetes.volumes.SecretVolume>
+            <mountPath>/home/jenkins/.gnupg</mountPath>
+            <secretName>jenkins-release-gpg</secretName>
+          </org.csanchez.jenkins.plugins.kubernetes.volumes.SecretVolume>
+          <org.csanchez.jenkins.plugins.kubernetes.volumes.ConfigMapVolume>
+            <mountPath>/home/jenkins/.github-jira-bot</mountPath>
+            <configMapName>github-jira-bot</configMapName>
+          </org.csanchez.jenkins.plugins.kubernetes.volumes.ConfigMapVolume>
+        </volumes>
+        <containers>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+            <name>github-jira-bot</name>
+            <image>bensmithdeveloper/github-jira-bot:feature-rewrite-go-0.0.1</image>
+            <privileged>true</privileged>
+            <alwaysPullImage>false</alwaysPullImage>
+            <workingDir>/home/jenkins</workingDir>
+            <command>/bin/sh -c</command>
+            <args>cat</args>
+            <ttyEnabled>true</ttyEnabled>
+            <resourceRequestCpu>400m</resourceRequestCpu>
+            <resourceRequestMemory>512Mi</resourceRequestMemory>
+            <resourceLimitCpu>1</resourceLimitCpu>
+            <resourceLimitMemory>2048Mi</resourceLimitMemory>
+            <envVars/>
+            <ports/>
+            <livenessProbe>
+              <execArgs></execArgs>
+              <timeoutSeconds>0</timeoutSeconds>
+              <initialDelaySeconds>0</initialDelaySeconds>
+              <failureThreshold>0</failureThreshold>
+              <periodSeconds>0</periodSeconds>
+              <successThreshold>0</successThreshold>
+            </livenessProbe>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+        </containers>
+        <envVars>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>DOCKER_CONFIG</key>
+            <value>/home/jenkins/.docker/</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>GIT_AUTHOR_EMAIL</key>
+            <value>jenkins-x@googlegroups.com</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>GIT_AUTHOR_NAME</key>
+            <value>jenkins-x-bot</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>GIT_COMMITTER_EMAIL</key>
+            <value>jenkins-x@googlegroups.com</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>GIT_COMMITTER_NAME</key>
+            <value>jenkins-x-bot</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>JENKINS_URL</key>
+            <value>http://jenkins:8080</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+          <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+            <key>XDG_CONFIG_HOME</key>
+            <value>/home/jenkins</value>
+          </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+        </envVars>
+        <annotations/>
+        <imagePullSecrets/>
+        <nodeProperties/>
+        <yaml></yaml>
+        <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Default"/>
+      </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+kind: ConfigMap
+metadata:
+  annotations:
+    jenkins.io/chart: jenkins-x-platform
+  labels:
+    jenkins.io/chart-release: jenkins-x
+    jenkins.io/kind: podTemplateXml
+    jenkins.io/namespace: jx
+    jenkins.io/version: 2.0.1391 # NOTE This is hopefully CLEARLY subject to change. I do not believe JX looks at it at this time.
+  name: jenkins-pod-xml-github-jira-bot

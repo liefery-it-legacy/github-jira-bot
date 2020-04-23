@@ -1,0 +1,16 @@
+componentMap:
+  repo: component
+github:
+  token: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  url: github.com
+  username: Benbentwo
+jira:
+  defaultIssueType: 'Task'
+  fixVersionId: v1.0.0
+  projectKey: GJB
+  sprintField: "1"
+  token: AAAAAAAAAAAAAAAAAAAAAAAA
+  url: https://github-jira-bot.atlassian.net
+  user: ben.smith.developer@gmail.com
+magicQaWord: 'QA:'
+maxLength: 600
