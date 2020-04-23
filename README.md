@@ -19,7 +19,7 @@ The bot does two things:
 
 First you need a place for the bot to run. We at Liefery use Jenkins for this.
 
-* Create a new item from the Jenkins dashboard and choose `Freestyle project`
+* Create a new item from the Jenkins dashboard and choose `Pipeline`
 * Select `Git` for Source Code Management:
   * Repository URL: `git@github.com:liefery/github-jira-bot.git`
   * Branch Specifier: `*/production`
@@ -27,19 +27,21 @@ First you need a place for the bot to run. We at Liefery use Jenkins for this.
   * Choose an `Authentication Token`. Remember your token as you'll need it later when [adding the bot to repositories on GitHub](#adding-the-bot-to-new-repos).
 * Select `Generic Webhook Trigger` for Build Triggers:
   * Add some `Post content parameters` (choose `JSONPath` as expression format):
-    * `ACTION` => `$.action`
     * `REPO` => `$.repository.full_name`
-    * `PR_TITLE` => `$.pull_request.title`
-    * `PR_TITLE` => `$.issue.title`
-    * `AUTHOR` => `$.comment.user.login`
+  	* `ACTION` => `$.action`
     * `PR_NUMBER` => `$.pull_request.number`
-    * `PR_NUMBER` => `$.issue.number`
-    * `COMMENT_ID` => `$.comment.id`
+    * `PR_TITLE` => `$.pull_request.title`
+    * `PR_AUTHOR` => `$.pull_request.user.login`
+    * `PR_DESC` => `$.pull_request.body`
+    * `COMMENT_AUTHOR` => `$.comment.user.login`
     * `COMMENT_BODY` => `$.comment.body`
+    * `COMMENT_ID` => `$.comment.id`
+    * `ISSUE_TITLE` => `$.issue.title`
+    * `ISSUE_NUMBER` => `$.issue.number`
   * Select `Print post content`
   * Select `Print contributed variables`
-* Add an `Execute shell` build step for Build:
-  * Command: Paste your [configuration](#configuration).
+* Add an `Pipeline script from SCM` build step for Build:
+  * Select your Jenkinsfile
 
 **Note:** `PR_TITLE` and `PR_NUMBER` will be set in different ways depending on the webhook used to trigger the bot.
 
