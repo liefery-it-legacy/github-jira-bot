@@ -169,7 +169,7 @@ func NewCmdCreateBot(commonOpts *common.CommonOptions) *cobra.Command {
 	cmd.Flags().StringVarP(&options.runConfig.MagicQAWord, "magic-word", "m", DefaultMagicWord, "Default Magic Word")
 	cmd.Flags().IntVarP(&options.runConfig.MaxLength, "max-length", "l", 600, "The maximum number of chars of a Jira ticket description that will be added to a pull request on GitHub. Omit this environment variable if you want to add the entire ticket description to GitHub.")
 
-	cmd.Flags().StringVarP(&options.FileName, "file", "f", DefaultConfigFile, "File Name to save the config to. Places in a ./config/<fileName>")
+	cmd.Flags().StringVarP(&options.FileName, "file", "f", "", "File Name to save the config to. Places in a ./config/<fileName>")
 
 	cmd.Flags().BoolVarP(&options.AskEverything, "ask-everything", "a", false, "Prompt the User for everything? (Clears Defaults)")
 
@@ -186,12 +186,13 @@ func (o *CreateBotOptions) Run() error {
 		o.runConfig.ClearConfig()
 	}
 
-	newConfig, err := GetConfigFromFile(o.FileName)
-	if err != nil {
-		return errors.Errorf("Error loading Run Config From file %s: %s", o.FileName, err)
+	if o.FileName != "" {
+		newConfig, err := GetConfigFromFile(o.FileName)
+		if err != nil {
+			return errors.Errorf("Error loading Run Config From file %s: %s", o.FileName, err)
+		}
+		o.runConfig = *newConfig
 	}
-
-	o.runConfig = *newConfig
 
 	path, _ := os.Getwd()
 	path = util.StripTrailingSlash(path) + "/" + util.StripTrailingSlash(DefaultConfigDir)
