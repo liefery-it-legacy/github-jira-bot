@@ -25,7 +25,11 @@ func CreateClient(token string, enterprise bool, enterpriseUrl string) (*github.
 	var client *github.Client
 	var err error
 	if enterprise {
-		client, err = github.NewEnterpriseClient("https://"+enterpriseUrl, enterpriseEndpoint, tc)
+		//baseURL := "https://custom-url/api/v3/"
+		baseUrl := "https://" + enterpriseUrl + enterpriseEndpoint
+		//uploadURL := "https://custom-upload-url/api/v3/"
+		client, err = github.NewEnterpriseClient(baseUrl, baseUrl, tc)
+		//github.NewEnterpriseClient()
 		if err != nil {
 			log.Fatal(err)
 		}

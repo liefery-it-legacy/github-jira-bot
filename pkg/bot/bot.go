@@ -259,8 +259,11 @@ func (bot *Bot) HandleCommentCreated() {
 		util.Warn("No Issue Found")
 		// The below code will create a new issue if the title or branch doesn't have a reference, omitting for now
 		// As I think most people would not want jira issues made for each pull request.
-		//_ , _, err := bot.CreateIssueAndUpdateGithubPrTitle()
-		//if err != nil {}
+
+		//bot.PrNumber
+		_, _, err := bot.CreateIssueAndUpdateGithubPrTitle()
+		if err != nil {
+		}
 		return
 	}
 
@@ -578,11 +581,35 @@ func (bot *Bot) CreateIssueAndUpdateGithubPrTitle() (*jira.Issue, *github.Issue,
 	if jiraIssue == nil {
 		return nil, nil, errors.Errorf("Error Creating Jira Issue: %s")
 	}
+	u, err := bot.GetJiraTicketUrl(jiraIssue)
+	util.Logger().Debugln("Created Jira Issue", u)
 	ghIssue, err := bot.UpdateGithubPrTitle(jiraIssue)
 	if err != nil {
 		return nil, nil, errors.Errorf("Create Issue and Update Pr failed with error: %s", err)
 	}
 	return jiraIssue, ghIssue, nil
+}
+
+func (bot *Bot) GetJiraTicketUrl(issue *jira.Issue) (string, error) {
+	if issue == nil {
+		return "", nil
+	}
+	return bot.JiraConfig.JiraUrl + "browse/" + issue.Key, nil
+}
+
+func (bot *Bot) GetGithubIssueUrl(issue *github.Issue) (string, error) {
+	if issue == nil {
+		return "", errors.Errorf("Cannot get URL of empty github issue!")
+	}
+	return "https://" + strings.TrimSuffix(bot.GithubConfig.Url, "/") + "/" + bot.Repo + "/issues/" + strconv.Itoa(*issue.Number), nil
+}
+
+func (bot *Bot) MustGetGithubIssueUrl(issue *github.Issue) string {
+	str, err := bot.GetGithubIssueUrl(issue)
+	if err != nil {
+		util.Logger().Fatalf("Must Get Github Issue URL failed: %s", err)
+	}
+	return str
 }
 
 // def create_issue
@@ -637,7 +664,16 @@ func (bot *Bot) CreateJiraIssue() *jira.Issue {
 
 // TODO support custom formatting of title here
 func (bot *Bot) UpdateGithubPrTitle(issue *jira.Issue) (*github.Issue, error) {
-	prefixedTitle := "[#" + issue.Key + "] " + bot.PrTitle
+	var title string
+	if bot.PrTitle != "" {
+		title = bot.PrTitle
+	} else if bot.IssueTitle != "" {
+		title = bot.IssueTitle
+	} else {
+		return nil, errors.Errorf("Error determining which title to use")
+	}
+	prefixedTitle := "[#" + issue.Key + "] " + title
+
 	org, repo, err := localGitHub.SeparateOrgAndRepo(bot.Repo)
 
 	if err != nil {
@@ -646,10 +682,32 @@ func (bot *Bot) UpdateGithubPrTitle(issue *jira.Issue) (*github.Issue, error) {
 	//id, err := strconv.Atoi(issue.ID) // Jira Issue Number
 	//if err != nil { return nil, err}
 
-	ghIssue, err := localGitHub.UpdateTitle(bot.GithubClient, org, repo, bot.PrNumber, prefixedTitle)
+	util.Logger().Debugf("PR: %d, Issue %d, IssueNumber: %d", bot.PrNumber, bot.IssueNum, bot.IssueNumber)
+	var ghIssue *github.Issue
+
+	if bot.PrNumber != 0 {
+		ghIssue, err = localGitHub.UpdateTitle(bot.GithubClient, org, repo, bot.PrNumber, prefixedTitle)
+		if err != nil {
+			util.Logger().Fatalf("Error updating github title on Pr Number %d", bot.PrNumber)
+		}
+	} else if bot.IssueNumber != 0 {
+		ghIssue, err = localGitHub.UpdateTitle(bot.GithubClient, org, repo, bot.IssueNumber, prefixedTitle)
+		if err != nil {
+			util.Logger().Fatalf("Error updating github title on Issue Number %d", bot.IssueNumber)
+		}
+	} else if bot.IssueNum != 0 {
+		ghIssue, err = localGitHub.UpdateTitle(bot.GithubClient, org, repo, bot.IssueNum, prefixedTitle)
+		if err != nil {
+			util.Logger().Fatalf("Error updating github title on Issue Num %d", bot.IssueNum)
+		}
+	} else {
+		util.Logger().Fatal("No number found to update a title upon")
+	}
+
 	if err != nil {
 		return nil, errors.Errorf("Error updating github PR title with issue id: %s", issue.ID)
 	}
+	util.Logger().Debugf("Updated Github Issue %s", bot.MustGetGithubIssueUrl(ghIssue))
 	return ghIssue, nil
 }
 
@@ -744,16 +802,32 @@ func (bot *Bot) CreateGithubClient(tokenEnv string, enterprise bool, enterpriseU
 }
 
 func (bot *Bot) ValidateGithubClient() error {
+	util.Logger().Debugf("bot GH Validator:\n\t%s:\t %t\n\t%s:\t %s\n\t%s:\t %s", "Enterprise", bot.GithubConfig.Enterprise, "Url", bot.GithubConfig.Url, "Username", bot.GithubConfig.Username)
 	if bot.GithubClient == nil {
 		return errors.Errorf("Github Client is nil, try running bot.CreateGithubClient(token, false, `github.com`) first")
 	}
-	str, _, err := bot.GithubClient.Zen(context.Background())
-	if err != nil {
-		return errors.Errorf("Error getting github zen, github client might not be properly configured: %s", err)
+	// github.com
+	if !bot.GithubConfig.Enterprise {
+		str, _, err := bot.GithubClient.Zen(context.Background())
+		if err != nil {
+			return errors.Errorf("Error getting github zen, github client might not be properly configured: %s", err)
+		}
+		util.Logger().Debugf("Zen String: `%s`", str)
+		repos, _, err := bot.GithubClient.Repositories.List(context.Background(), "", &github.RepositoryListOptions{})
+		if err != nil {
+			return errors.Errorf("Error getting github user repositories, github client might not be properly configured: %s", err)
+		}
+		util.Logger().Debugf("Number of repos owned by user: `%d`", len(repos))
+		return nil
 	}
-	util.Logger().Debugf("Zen String: `%s`", str)
+
+	//github.ABC.com
 	repos, _, err := bot.GithubClient.Repositories.List(context.Background(), "", &github.RepositoryListOptions{})
+	if err != nil {
+		return errors.Errorf("Error getting github user repositories, github client might not be properly configured: %s", err)
+	}
 	util.Logger().Debugf("Number of repos owned by user: `%d`", len(repos))
+	util.Logger().Debugln()
 	return nil
 }
 
