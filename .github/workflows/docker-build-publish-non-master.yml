@@ -1,0 +1,33 @@
+name: Docker Build
+on:
+  push:
+    branches:
+      - /refs/heads/*
+      - !master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go environment
+        uses: actions/setup-go@v2.0.3
+
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Extract branch name
+        shell: bash
+#        Gets the branch name, then cleans up unsavory characters.
+#          Replaces:
+#             _ -> -
+#             / -> -
+#             . -> -
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed 's/_/-/g' | sed 's@/@-@g' | sed 's/%2F/-/g' | sed 's/\\./-/g' )"
+        id: extract_branch
+
+      - run: |
+          #short_ref=$(git rev-parse --short ${{github.sha}})
+          tag=${{ steps.extract_branch.outputs.branch }}
+          image=bensmithdeveloper/github-jira-bot
+          full_image=${image}:${tag}
+          docker build -t ${full_image} .
+          docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+          docker push
