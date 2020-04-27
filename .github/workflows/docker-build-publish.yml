@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v1
 
       - run: |
-          shortRef=$(git rev-parse --short ${{github.sha}}
+          shortRef=$(git rev-parse --short ${{github.sha}})
           docker build -t bensmithdeveloper/github-jira-bot:${shortRef} .
 
       - name: Publish to Registry
