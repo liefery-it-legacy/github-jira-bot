@@ -22,9 +22,9 @@ jobs:
 #          Limits Length to 120
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed 's@/@-@g' | sed 's/%2F/-/g' | cut -c1-119)"
 
+#       Tag = <BranchName (Tag Safe)>-<Short Commit Hash>
       - run: |
           short_ref=$(git rev-parse --short ${{github.sha}})
-#          Tag= <BranchName (Tag Safe)>-<Short Commit Hash>
           tag=${{ steps.extract_branch.outputs.branch }}-${short_ref}
           image=bensmithdeveloper/github-jira-bot
           full_image=${image}:${tag}
