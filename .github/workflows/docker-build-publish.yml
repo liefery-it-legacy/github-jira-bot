@@ -10,7 +10,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - run: docker build -t bensmithdeveloper/github-jira-bot:${{github.ref}}
+      - run: |
+          shortRef=$(git rev-parse --short ${{github.ref}}
+          docker build -t bensmithdeveloper/github-jira-bot:${shortRef} .
 
       - name: Publish to Registry
         uses: HurricanKai/Publish-Docker-Github-Action@master
