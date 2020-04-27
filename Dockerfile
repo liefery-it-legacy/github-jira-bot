@@ -11,8 +11,15 @@ ARG target_arch=amd64
 
 # Build the server Binary
 WORKDIR /go/src/${GIT_SERVER}/${GIT_ORG}/${GIT_REPO}
-ADD . ./
-RUN go get -u ./...
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+# Seems duplicative, and ideally not needed
+#COPY . .
+
 RUN CGO_ENABLED=0 GOOS=${target_os} GOARCH=${target_arch} go build -a -o /app/${binary_name} main.go
 
 RUN ls /app
