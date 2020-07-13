@@ -33,6 +33,7 @@ class Bot
     handle_comment_created if @qa_comment.present? && !@qa_comment.empty? && @action == "created" && @author != @bot_github_login
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   def handle_pull_request(action:, title:, pr_number:)
     @action    = action
     @title     = title
@@ -46,6 +47,7 @@ class Bot
 
     handle_pull_request_opened if @jira_url.present? && @action == "opened"
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def extract_issue_id(title)
     match_data = title.match(pr_name_ticket_id_regex) || title.match(branch_name_ticket_id_regex)

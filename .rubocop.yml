@@ -15,12 +15,32 @@ AllCops:
     - 'config/**/*'
     - 'node_modules/**/*'
 
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
 Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
 
 Layout/LineLength:
   Max: 150
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*'
+
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
 
 Metrics/BlockLength:
   ExcludedMethods: ['describe', 'context', 'feature']
@@ -42,6 +62,18 @@ Style/ClassAndModuleChildren:
   Enabled: false
 
 Style/Documentation:
+  Enabled: false
+
+Style/ExponentialNotation:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
   Enabled: false
 
 Style/MultilineBlockChain:
@@ -77,6 +109,15 @@ Style/MutableConstant:
 Style/NumericLiterals:
   Enabled: false
 
+Style/RedundantFetchBlock:
+  Enabled: false
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: false
+
+Style/RedundantRegexpEscape:
+  Enabled: false
+
 Style/RegexpLiteral:
   Enabled: false
 
@@ -85,6 +126,9 @@ Style/SingleLineBlockParams:
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+
+Style/SlicingWithRange:
+  Enabled: false
 
 Style/FormatStringToken:
   Enabled: false
