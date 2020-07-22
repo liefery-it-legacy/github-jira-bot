@@ -18,9 +18,9 @@ GEM
     dotenv (2.7.6)
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
-    i18n (1.8.3)
+    i18n (1.8.4)
       concurrent-ruby (~> 1.0)
-    jira-ruby (2.1.1)
+    jira-ruby (2.1.2)
       activesupport
       atlassian-jwt
       multipart-post
