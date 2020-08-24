@@ -4,6 +4,9 @@ require "spec_helper"
 require "configuration/jira"
 require "bot"
 
+# rubocop: disable RSpec/MultipleMemoizedHelpers
+# https://rubocop-rspec.readthedocs.io/en/latest/cops_rspec/#rspecmultiplememoizedhelpers
+
 describe Bot do
   let(:action)                  { "created" }
   let(:title)                   { "[LIEF-1234] Cure world hunger" }
@@ -305,3 +308,4 @@ describe Bot do
     end
   end
 end
+# rubocop: enable RSpec/MultipleMemoizedHelpers
