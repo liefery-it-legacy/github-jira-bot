@@ -9,7 +9,9 @@ require "bot"
 require "configuration/jira"
 
 def get_array_from_env(key)
-  JSON.parse(ENV[key]) rescue []
+  JSON.parse(ENV[key])
+rescue StandardError
+  []
 end
 
 repo                  = ENV.fetch("REPO", "")
