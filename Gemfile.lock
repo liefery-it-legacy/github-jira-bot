@@ -83,6 +83,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   dotenv
   jira-ruby
   octokit

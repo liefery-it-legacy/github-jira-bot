@@ -4,6 +4,7 @@ source "https://rubygems.org"
 gem "jira-ruby"
 gem "octokit"
 gem "dotenv"
+gem "activesupport"
 
 group :development do
   gem "rspec"
