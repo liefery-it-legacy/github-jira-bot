@@ -301,10 +301,20 @@ describe Bot do
     end
 
     context "when linked issue doesn't exist" do
-      it "returns nil" do
+      before do
         allow(Jira::Issue).to receive(:find).and_return nil
+      end
+
+      it "returns nil" do
         expect(Github::Comment).not_to receive(:create)
         expect(handle_pull_request).to eq(nil)
+      end
+
+      it "creates an issue for a 'depfu'-labeled PR and renames the PR" do
+        pr_labels = ["depfu"]
+
+        expect(Jira::Issue).to receive(:create).and_return(double(key: "LIEF-123"))
+        expect(Github::PullRequest).to receive(:update_title)
       end
     end
   end
