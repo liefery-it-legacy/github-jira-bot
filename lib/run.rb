@@ -8,10 +8,15 @@ require "json"
 require "bot"
 require "configuration/jira"
 
+def get_array_from_env(key)
+  JSON.parse(ENV[key]) rescue []
+end
+
 repo                  = ENV.fetch("REPO", "")
 action                = ENV.fetch("ACTION", "")
 title                 = ENV.fetch("PR_TITLE", "")
 pr_number             = ENV.fetch("PR_NUMBER", "")
+pr_labels             = get_array_from_env("PR_LABELS")
 author                = ENV.fetch("AUTHOR", "")
 
 comment               = ENV.fetch("COMMENT_BODY", "")
@@ -58,7 +63,7 @@ begin
   if pull_request_comment?(action, title, comment, pr_number, author, comment_id)
     bot.handle_comment(action: action, title: title, comment: comment, pr_number: pr_number, author: author, comment_id: comment_id)
   elsif pull_request?(action, title, pr_number)
-    bot.handle_pull_request(action: action, title: title, pr_number: pr_number)
+    bot.handle_pull_request(action: action, title: title, pr_number: pr_number, pr_labels: pr_labels)
   end
 rescue JIRA::HTTPError => e
   puts "JIRA responded with #{e.response.code}: #{e.response.body}"

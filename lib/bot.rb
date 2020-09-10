@@ -11,6 +11,8 @@ require "parser/jira_to_github/heading"
 
 # rubocop:disable Metrics/ClassLength
 class Bot
+  DEPFU_LABEL = "depfu"
+
   def initialize(repo:, magic_qa_keyword:, max_description_chars:, component_map:, bot_github_login:, jira_configuration:)
     @repo                  = repo
     @magic_qa_keyword      = magic_qa_keyword
@@ -34,11 +36,12 @@ class Bot
   end
 
   # rubocop:disable Metrics/CyclomaticComplexity
-  def handle_pull_request(action:, title:, pr_number:)
+  def handle_pull_request(action:, title:, pr_number:, pr_labels:)
     @action    = action
     @title     = title
     jira_issue = find_issue_by_title(@title)
-    return if jira_issue.nil?
+    @pr_labels = pr_labels
+    return handle_pull_request_without_jira_issue if jira_issue.nil?
 
     @jira_url         = jira_issue&.attrs&.dig("url")
     @jira_description = jira_issue&.attrs&.dig("fields", "description")
@@ -48,6 +51,10 @@ class Bot
     handle_pull_request_opened if @jira_url.present? && @action == "opened"
   end
   # rubocop:enable Metrics/CyclomaticComplexity
+
+  def handle_pull_request_without_jira_issue
+    create_issue_and_update_github_pr_title if depfu_pr?
+  end
 
   def extract_issue_id(title)
     match_data = title.match(pr_name_ticket_id_regex) || title.match(branch_name_ticket_id_regex)
@@ -137,6 +144,10 @@ class Bot
 
   def branch_name_ticket_id_regex
     /\A\w+\/#{@jira_configuration.project_key} (\d+)/i
+  end
+
+  def depfu_pr?
+    @pr_labels.include? DEPFU_LABEL
   end
 end
 # rubocop:enable Metrics/ClassLength
