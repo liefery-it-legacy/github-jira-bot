@@ -10,7 +10,7 @@ require "configuration/jira"
 
 def get_array_from_env(key)
   JSON.parse(ENV[key])
-rescue TypeError
+rescue TypeError, JSON::ParserError
   []
 end
 
