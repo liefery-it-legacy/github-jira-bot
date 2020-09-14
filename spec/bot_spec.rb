@@ -310,11 +310,14 @@ describe Bot do
         expect(handle_pull_request).to eq(nil)
       end
 
-      it "creates an issue for a 'depfu'-labeled PR and renames the PR" do
-        pr_labels = ["depfu"]
+      context "Depfu PR" do
+        let(:pr_labels) { ["depfu"] }
 
-        expect(Jira::Issue).to receive(:create).and_return(double(key: "LIEF-123"))
-        expect(Github::PullRequest).to receive(:update_title)
+        it "creates an issue and renames the PR" do
+          expect(Jira::Issue).to receive(:create).and_return(double(key: "LIEF-123"))
+          expect(Github::PullRequest).to receive(:update_title)
+          subject
+        end
       end
     end
   end
