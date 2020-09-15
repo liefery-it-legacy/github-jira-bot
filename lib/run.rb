@@ -8,10 +8,17 @@ require "json"
 require "bot"
 require "configuration/jira"
 
+def get_array_from_env(key)
+  JSON.parse(ENV[key])
+rescue TypeError, JSON::ParserError
+  []
+end
+
 repo                  = ENV.fetch("REPO", "")
 action                = ENV.fetch("ACTION", "")
 title                 = ENV.fetch("PR_TITLE", "")
 pr_number             = ENV.fetch("PR_NUMBER", "")
+pr_labels             = get_array_from_env("PR_LABELS")
 author                = ENV.fetch("AUTHOR", "")
 
 comment               = ENV.fetch("COMMENT_BODY", "")
@@ -31,12 +38,12 @@ Octokit.configure do |c|
   c.password = ENV.fetch("GITHUB_PASSWORD")
 end
 
-def issue_comment?(action, title, comment, pr_number, author, comment_id)
-  !action.empty? && !title.empty? && !comment.empty? && !pr_number.empty? && !author.empty? && !comment_id.empty?
+def pull_request_comment?(action, title, comment, pr_number, author, comment_id)
+  pull_request?(action, title, pr_number) && comment.present? && author.present? && comment_id.present?
 end
 
 def pull_request?(action, title, pr_number)
-  !action.empty? && !title.empty? && !pr_number.empty?
+  action.present? && title.present? && pr_number.present?
 end
 
 jira_configuration = Configuration::Jira.new(
@@ -55,10 +62,10 @@ bot = Bot.new(
 )
 
 begin
-  if issue_comment?(action, title, comment, pr_number, author, comment_id)
+  if pull_request_comment?(action, title, comment, pr_number, author, comment_id)
     bot.handle_comment(action: action, title: title, comment: comment, pr_number: pr_number, author: author, comment_id: comment_id)
   elsif pull_request?(action, title, pr_number)
-    bot.handle_pull_request(action: action, title: title, pr_number: pr_number)
+    bot.handle_pull_request(action: action, title: title, pr_number: pr_number, pr_labels: pr_labels)
   end
 rescue JIRA::HTTPError => e
   puts "JIRA responded with #{e.response.code}: #{e.response.body}"

@@ -15,6 +15,7 @@ describe Bot do
   let(:repo)                    { "foo/bar" }
   let(:author)                  { "jonhue" }
   let(:pr_number)               { 23 }
+  let(:pr_labels)               { ["WIP - work in progress"] }
   let(:comment_id)              { 12345 }
   let(:jira_transition_id)      { nil }
   let(:max_description_chars)   { 600 }
@@ -217,7 +218,7 @@ describe Bot do
   end
 
   describe "#handle_pull_request" do
-    subject(:handle_pull_request) { bot.handle_pull_request(action: "opened", title: title, pr_number: pr_number) }
+    subject(:handle_pull_request) { bot.handle_pull_request(action: "opened", title: title, pr_number: pr_number, pr_labels: pr_labels) }
 
     context "when linked issue exists" do
       it "adds issue URL and description to GitHub when description exists" do
@@ -287,7 +288,7 @@ describe Bot do
 
           expect(Github::Comment).to receive(:create)
           expect(Github::PullRequest).to receive(:update_title).with(repo, pr_number, title)
-          bot.handle_pull_request(action: "opened", title: branch_name_based_title, pr_number: pr_number)
+          bot.handle_pull_request(action: "opened", title: branch_name_based_title, pr_number: pr_number, pr_labels: pr_labels)
         end
       end
 
@@ -295,15 +296,29 @@ describe Bot do
         allow(Jira::Issue)
           .to receive(:find).with(nil).and_raise("One does not simply find a JIRA issue without an ID!")
 
-        bot.handle_pull_request(action: "opened", title: "I don't give an id", pr_number: pr_number)
+        bot.handle_pull_request(action: "opened", title: "I don't give an id", pr_number: pr_number, pr_labels: pr_labels)
       end
     end
 
     context "when linked issue doesn't exist" do
-      it "returns nil" do
+      before do
         allow(Jira::Issue).to receive(:find).and_return nil
+      end
+
+      it "returns nil" do
         expect(Github::Comment).not_to receive(:create)
         expect(handle_pull_request).to eq(nil)
+      end
+
+      context "when Depfu PR" do
+        let(:pr_labels) { ["depfu"] }
+
+        it "creates an issue and renames the PR" do
+          expect(Jira::Issue).to receive(:create).and_return(double(key: "LIEF-123"))
+          expect(Github::PullRequest).to receive(:update_title)
+
+          handle_pull_request
+        end
       end
     end
   end

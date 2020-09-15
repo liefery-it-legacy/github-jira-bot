@@ -36,6 +36,7 @@ First you need a place for the bot to run. We at Liefery use Jenkins for this.
     * `PR_NUMBER` => `$.issue.number`
     * `COMMENT_ID` => `$.comment.id`
     * `COMMENT_BODY` => `$.comment.body`
+    * `PR_LABELS` => `$.pull_request.labels[*].name`
   * Select `Print post content`
   * Select `Print contributed variables`
 * Add an `Execute shell` build step for Build:
